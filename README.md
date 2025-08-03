@@ -67,3 +67,4 @@ If you think this implementation is useful for your work, please cite our paper:
 * Latency measurement code is borrowed from the [DDRNet](https://github.com/ydhongHIT/DDRNet).
 * Thanks for their nice contribution.
 
+# Signal_Segmentation
