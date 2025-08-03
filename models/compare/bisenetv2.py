@@ -93,7 +93,6 @@ class CEBlock(nn.Module):
         super(CEBlock, self).__init__()
         self.bn = nn.BatchNorm2d(128)
         self.conv_gap = ConvBNReLU(128, 128, 1, stride=1, padding=0)
-        #TODO: in paper here is naive conv2d, no bn-relu
         self.conv_last = ConvBNReLU(128, 128, 3, stride=1)
 
     def forward(self, x):
@@ -226,7 +225,6 @@ class BGALayer(nn.Module):
         )
         self.up1 = nn.Upsample(scale_factor=4)
         self.up2 = nn.Upsample(scale_factor=4)
-        ##TODO: does this really has no relu?
         self.conv = nn.Sequential(
             nn.Conv2d(128, 128, kernel_size=3, stride=1,padding=1, bias=False),
             nn.BatchNorm2d(128),
@@ -283,14 +281,8 @@ class BiSeNetV2(nn.Module):
         self.segment = SegmentBranch()
         self.bga = BGALayer()
 
-        ## TODO: what is the number of mid chan ?
         self.head = SegmentHead(128, 1024, num_classes, up_factor=8, aux=False)
-        # self.aux2 = SegmentHead(16, 128, num_classes, up_factor=4)
         self.aux3 = SegmentHead(32, 128, num_classes, up_factor=8)
-        # self.aux4 = SegmentHead(64, 128, num_classes, up_factor=16)
-        # self.aux5_4 = SegmentHead(128, 128, num_classes, up_factor=32)
-
-        # self.init_weights()
 
     def forward(self, x):
         size = x.size()[2:]

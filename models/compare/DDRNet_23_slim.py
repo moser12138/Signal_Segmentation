@@ -334,25 +334,3 @@ class DualResNet(nn.Module):
             return [x_, x_extra]
         else:
             return x_
-
-# def DualResNet_imagenet(pretrained=False, new_state_dict=None):
-#     model = DualResNet(BasicBlock, [2, 2, 2, 2], num_classes=19, planes=32, spp_planes=128, head_planes=64, augment=False)
-#     if pretrained:
-#         checkpoint = torch.load('/home/user1/hyd/HRNet/' + "DDRNet23s_imagenet.pth", map_location='cpu')
-#         '''
-#         new_state_dict = OrderedDict()
-#         for k, v in checkpoint['state_dict'].items():
-#             name = k[7:]
-#             new_state_dict[name] = v
-#         #model_dict.update(new_state_dict)
-#         #model.load_state_dict(model_dict)
-#         '''
-#         model.load_state_dict(new_state_dict, strict = False)
-#     return model
-#
-# def get_seg_model(cfg, **kwargs):
-#
-#     model = DualResNet_imagenet(pretrained=False)
-#     return model
-
-

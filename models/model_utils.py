@@ -1,6 +1,3 @@
-# ------------------------------------------------------------------------------
-# Written by Jiacong Xu (jiacong.xu@tamu.edu)
-# ------------------------------------------------------------------------------
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -23,7 +20,7 @@ class BasicBlock(nn.Module):
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3,padding=1, bias=False)
         self.bn2 = BatchNorm2d(planes, momentum=bn_mom)
 
-        self.downsample = downsample#此处dowmsample从_make_layer传入
+        self.downsample = downsample
         self.stride = stride
         self.no_relu = no_relu
 
@@ -38,9 +35,9 @@ class BasicBlock(nn.Module):
         out = self.bn2(out)
 
         if self.downsample is not None:
-            residual = self.downsample(x)#下采样操作从_make_layer中传入
+            residual = self.downsample(x)
 
-        out += residual#结果与残差相加
+        out += residua
 
         if self.no_relu:
             return out

@@ -18,12 +18,11 @@ algc = False
 def get_seg_model(cfg, imgnet_pretrained):
 
     model = SemanticSegmentationNet(num_classes=cfg.DATASET.NUM_CLASSES, augment=True)
-    # model = BiSeNetV2(num_classes=cfg.DATASET.NUM_CLASSES, augment=True)
-    # model = Resnet18(num_classes=cfg.DATASET.NUM_CLASSES, augment=True)
-    # model = DualResNet(BasicBlock, [2, 2, 2, 2], num_classes=cfg.DATASET.NUM_CLASSES, augment=True)
+    model = BiSeNetV2(num_classes=cfg.DATASET.NUM_CLASSES, augment=True)
+    model = Resnet18(num_classes=cfg.DATASET.NUM_CLASSES, augment=True)
+    model = DualResNet(BasicBlock, [2, 2, 2, 2], num_classes=cfg.DATASET.NUM_CLASSES, augment=True)
 
     if imgnet_pretrained:
-        # pretrained_state = torch.load(cfg.MODEL.PRETRAINED, map_location='cpu')['state_dict']
         pretrained_state = torch.load(cfg.MODEL.PRETRAINED, map_location='cpu')
         model_dict = model.state_dict()
         pretrained_state = {k: v for k, v in pretrained_state.items() if (k in model_dict and v.shape == model_dict[k].shape)}
@@ -57,11 +56,10 @@ def get_pred_model(num_classes):
     model = SemanticSegmentationNet(num_classes=num_classes, augment=False)
     return model
 
-
 # 测试模型的推理速度（FPS）和延迟（latency），并打印出结果
 if __name__ == '__main__':
     device = torch.device('cuda')
-    model = get_pred_model(name='pidnet_s', num_classes=19)
+    model = get_pred_model(num_classes=19)
     model.eval()
     model.to(device)
     iterations = None

@@ -216,49 +216,41 @@ class MutiFusion(nn.Module):
             nn.Conv2d(in_channels=h_channels, out_channels=m_channels, kernel_size=3, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(m_channels),
         )
-        # self.low_modify1 = nn.Conv2d(in_channels=2 * m_channels, out_channels=m_channels, kernel_size=1, stride=1, bias=False)
         self.low_2 = nn.Sequential(
             nn.Conv2d(in_channels=m_channels, out_channels=l_channels, kernel_size=3, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(l_channels),
         )
-        # self.low_modify2 = nn.Conv2d(in_channels=2 * l_channels, out_channels=l_channels, kernel_size=1, stride=1, bias=False)
-
 
         self.mid_1 = nn.Sequential(
             nn.Conv2d(in_channels=h_channels, out_channels=m_channels, kernel_size=3, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(m_channels),
         )
-        # self.mid_modify1 = nn.Conv2d(in_channels=2 * m_channels, out_channels=m_channels, kernel_size=1, stride=1, bias=False)
+
         self.mid_2 = nn.Sequential(
             nn.Conv2d(in_channels=l_channels, out_channels=m_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(m_channels),
         )
-        # self.mid_modify2 = nn.Conv2d(in_channels=2 * m_channels, out_channels=m_channels, kernel_size=1, stride=1, bias=False)
-
 
         self.high_1 = nn.Sequential(
             nn.Conv2d(in_channels=l_channels, out_channels=m_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(m_channels),
         )
-        # self.high_modify1 = nn.Conv2d(in_channels=2 * m_channels, out_channels=m_channels, kernel_size=1, stride=1, bias=False)
+
         self.high_2 = nn.Sequential(
             nn.Conv2d(in_channels=m_channels, out_channels=h_channels, kernel_size=1, stride=1, bias=False),
             nn.BatchNorm2d(h_channels),
         )
-        # self.high_modify2 = nn.Conv2d(in_channels=2 * h_channels, out_channels=h_channels, kernel_size=1, stride=1, bias=False)
+        self.high_modify2 = nn.Conv2d(in_channels=2 * h_channels, out_channels=h_channels, kernel_size=1, stride=1, bias=False)
 
 
     def forward(self, h, m, l):
         l1 = self.relu(self.low_1(h) + m)
         l1 = self.relu(self.low_2(l1) + l)
 
-        # h1 = self.relu(F.interpolate(self.high_1(l), scale_factor=2, mode='bilinear', align_corners=False) + m)
         h1 = self.relu(F.interpolate(self.high_1(l), size=m.shape[2:], mode='bilinear', align_corners=False) + m)
 
-        # h1 = self.relu(F.interpolate(self.high_2(h1), scale_factor=2, mode='bilinear', align_corners=False) + h)
         h1 = self.relu(F.interpolate(self.high_2(h1), size=h.shape[2:], mode='bilinear', align_corners=False) + h)
 
-        # m = self.relu(F.interpolate(self.mid_2(l), scale_factor=2, mode='bilinear', align_corners=False) + m)
         m = self.relu(F.interpolate(self.mid_2(l), size=m.shape[2:], mode='bilinear', align_corners=False) + m)
 
         m = self.relu(self.mid_1(h) + m)
@@ -361,11 +353,6 @@ class SemanticSegmentationNet(nn.Module):
             ResidualBlock(64, 64),
         )
 
-        # self.s1_p4 = nn.Sequential(
-        #     ResidualBlock(64, 64),
-        #     ResidualBlock(64, 64),
-        # )
-
         self.s1_p = nn.Sequential(
             ResidualBlock(64, 64),
             CBAM(64)
@@ -386,10 +373,7 @@ class SemanticSegmentationNet(nn.Module):
             ResidualBlock(128, 128),
             ResidualBlock(128, 128),
         )
-        # self.s2_p4 = nn.Sequential(
-        #     ResidualBlock(128, 128),
-        #     ResidualBlock(128, 128),
-        # )
+
         self.s2_p = nn.Sequential(
             ResidualBlock(128, 128),
             CBAM(128)
@@ -410,10 +394,7 @@ class SemanticSegmentationNet(nn.Module):
             ResidualBlock(256, 256),
             ResidualBlock(256, 256),
         )
-        # self.s3_p4 = nn.Sequential(
-        #     ResidualBlock(256, 256),
-        #     ResidualBlock(256, 256),
-        # )
+
         self.s3_p = nn.Sequential(
             ResidualBlock(256, 256),
             CBAM(256)
@@ -445,14 +426,11 @@ class SemanticSegmentationNet(nn.Module):
         x = self.s1_p1(xtem)
         x = self.s1_p2(x)
         x = self.s1_p3(x)
-        # x = self.s1_p4(x)
 
         xm = self.s2(x)  # [B, 256, H/16, W/16]
         xm = self.s2_p1(xm)  # [B, 256, H/16, W/16]
         xm = self.s2_p2(xm)  # [B, 256, H/16, W/16]
         xm = self.s2_p3(xm)  # [B, 256, H/16, W/16]
-        # xm = self.s2_p4(xm)  # [B, 256, H/16, W/16]
-
 
         xl = self.s3(xm)  # [B, 512, H/32, W/32]
         xl = self.s3_p1(xl)  # [B, 512, H/32, W/32]
@@ -461,8 +439,6 @@ class SemanticSegmentationNet(nn.Module):
         x, xm, xl = self.change2(x, xm, xl)
         xl = self.s3_p3(xl)  # [B, 512, H/32, W/32]
         x, xm, xl = self.change3(x, xm, xl)
-        # xl = self.s3_p4(xl)  # [B, 512, H/32, W/32]
-        # x, xm, xl = self.change4(x, xm, xl)
 
         x = self.s1_p(x)
         xm = self.s2_p(xm)
@@ -483,8 +459,6 @@ class SemanticSegmentationNet(nn.Module):
             return out
 
 if __name__ == '__main__':
-    # Comment batchnorms here and in model_utils before testing speed since the batchnorm could be integrated into conv operation
-    # (do not comment all, just the batchnorm following its corresponding conv layer)
     device = torch.device('cuda')
     model = SemanticSegmentationNet(num_classes=19)
     model.eval()
